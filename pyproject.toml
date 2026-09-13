@@ -1,0 +1,43 @@
+[project]
+name = "integration-hub"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Rian Nascimento",email = "rian@nascimentodev.com"}
+]
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi (>=0.141.1,<0.142.0)",
+    "uvicorn[standard] (>=0.52.4,<0.53.0)",
+    "sqlalchemy (>=2.0.52,<3.0.0)",
+    "pydantic-settings (>=2.15.0,<3.0.0)",
+    "psycopg2-binary (>=2.9.13,<3.0.0)",
+    "alembic (>=1.20.0,<2.0.0)"
+]
+
+[tool.poetry]
+packages = [{include = "integration_hub", from = "src"}]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest (>=9.1.1,<10.0.0)",
+    "pytest-cov (>=7.1.0,<8.0.0)",
+    "httpx (>=0.28.1,<0.29.0)",
+    "ruff (>=0.16.7,<0.17.0)"
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
