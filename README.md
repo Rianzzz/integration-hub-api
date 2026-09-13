@@ -21,9 +21,11 @@ pra buscar os dados externos, normaliza e usa um `repository` pra persistir.
 
 ## Como rodar
 
-Pré-requisitos: [Poetry](https://python-poetry.org/) e Python 3.14+.
+Pré-requisitos: [Poetry](https://python-poetry.org/), Python 3.14+ e Docker.
 
 ```bash
+cp .env.example .env       # ajuste se quiser, os defaults já funcionam
+docker compose up -d db    # sobe o Postgres
 poetry install
 poetry run uvicorn integration_hub.main:app --reload
 ```
