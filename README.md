@@ -32,6 +32,13 @@ poetry run uvicorn integration_hub.main:app --reload
 
 A API sobe em `http://localhost:8000`. Documentação interativa em `http://localhost:8000/docs`.
 
+## Migrations
+
+```bash
+poetry run alembic upgrade head              # aplica migrations pendentes
+poetry run alembic revision --autogenerate -m "descricao"   # gera uma nova a partir dos models
+```
+
 ## Testes
 
 ```bash
