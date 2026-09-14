@@ -22,6 +22,10 @@ pra buscar os dados externos, normaliza e usa um `repository` pra persistir.
 `domain/schemas.py` define os contratos Pydantic: `CustomerCreate` (dado normalizado pronto pra
 persistir) e `CustomerRead` (formato de saída da API, sem o `raw_payload`).
 
+Cada fonte externa tem um adapter em `integrations/`, que implementa `SourceAdapter`
+(`fetch_raw_customers` + `normalize`). São dados simulados (sem API paga de terceiro),
+mas a estrutura é a mesma que se usaria pra consumir uma API real.
+
 ## Como rodar
 
 Pré-requisitos: [Poetry](https://python-poetry.org/), Python 3.14+ e Docker.
