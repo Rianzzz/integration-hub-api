@@ -19,6 +19,9 @@ core/           → configuração, conexão com banco, logging.
 Fluxo típico: `api` recebe a request → chama um `service` → o `service` usa um `integration`
 pra buscar os dados externos, normaliza e usa um `repository` pra persistir.
 
+`domain/schemas.py` define os contratos Pydantic: `CustomerCreate` (dado normalizado pronto pra
+persistir) e `CustomerRead` (formato de saída da API, sem o `raw_payload`).
+
 ## Como rodar
 
 Pré-requisitos: [Poetry](https://python-poetry.org/), Python 3.14+ e Docker.
