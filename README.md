@@ -24,7 +24,10 @@ persistir) e `CustomerRead` (formato de saída da API, sem o `raw_payload`).
 
 Cada fonte externa tem um adapter em `integrations/`, que implementa `SourceAdapter`
 (`fetch_raw_customers` + `normalize`). São dados simulados (sem API paga de terceiro),
-mas a estrutura é a mesma que se usaria pra consumir uma API real.
+mas a estrutura é a mesma que se usaria pra consumir uma API real. Cada fonte chega em um
+formato diferente (Fonte A: campos em português; Fonte B: contato aninhado; Fonte C: cadastro
+mínimo), e o adapter é o único lugar que conhece esse formato — pro resto do sistema, todo
+cliente normalizado tem a mesma cara (`CustomerCreate`).
 
 ## Como rodar
 
