@@ -44,6 +44,9 @@ poetry run alembic revision --autogenerate -m "descricao"   # gera uma nova a pa
 
 ## Testes
 
+Os testes de repository rodam contra o Postgres real (não usam mocks nem SQLite) —
+é necessário ter o `docker compose up -d db` de pé antes de rodar.
+
 ```bash
 poetry run pytest
 ```
