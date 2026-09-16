@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from integration_hub.api.deps import CustomerRepositoryDep, CustomerSyncServiceDep
+from integration_hub.api.deps import CurrentUserDep, CustomerRepositoryDep, CustomerSyncServiceDep
 from integration_hub.domain.exceptions import CustomerNotFoundError
 from integration_hub.domain.schemas import CustomerRead, SyncResult
 from integration_hub.integrations.base import SourceAdapter
@@ -18,8 +18,10 @@ _ADAPTERS: dict[str, type[SourceAdapter]] = {
 
 
 @router.post("/sync", response_model=list[SyncResult])
-def sync_all_sources(service: CustomerSyncServiceDep) -> list[SyncResult]:
-    """Sincroniza todas as fontes registradas. Idempotente: pode rodar quantas vezes quiser."""
+def sync_all_sources(service: CustomerSyncServiceDep, _user: CurrentUserDep) -> list[SyncResult]:
+    """Sincroniza todas as fontes registradas. Idempotente: pode rodar quantas vezes quiser.
+
+    Requer autenticação (é a única rota que altera dados)."""
     return [service.sync(adapter_cls()) for adapter_cls in _ADAPTERS.values()]
 
 

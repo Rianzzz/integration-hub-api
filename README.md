@@ -37,7 +37,8 @@ da mesma fonte várias vezes não duplica clientes — é *idempotente*.
 
 | Método | Rota                  | Descrição                                    |
 |--------|------------------------|-----------------------------------------------|
-| POST   | `/customers/sync`      | Sincroniza as 3 fontes (idempotente)          |
+| POST   | `/auth/token`          | Login (form: username, password) → JWT        |
+| POST   | `/customers/sync`      | Sincroniza as 3 fontes (idempotente, requer login) |
 | GET    | `/customers`           | Lista todos os clientes normalizados          |
 | GET    | `/customers/{id}`      | Busca um cliente por id                        |
 | GET    | `/health`              | Health check                                   |
@@ -49,6 +50,19 @@ Erros de domínio (`domain/exceptions.py`) são traduzidos pra respostas HTTP em
 Qualquer erro inesperado vira 500 com uma mensagem genérica (nunca vaza detalhe interno pro
 cliente) e vai pro log com o traceback completo. Logging estruturado configurado em
 `core/logging.py`.
+
+## Autenticação
+
+`POST /customers/sync` exige autenticação (é a única rota que altera dados; leitura é pública).
+
+```bash
+curl -X POST http://localhost:8000/auth/token -d "username=admin&password=admin"
+# copie o access_token da resposta
+
+curl -X POST http://localhost:8000/customers/sync -H "Authorization: Bearer <token>"
+```
+
+Usuário/senha e a chave do JWT vêm do `.env` (`API_USERNAME`, `API_PASSWORD`, `JWT_SECRET_KEY`).
 
 ## Resiliência
 

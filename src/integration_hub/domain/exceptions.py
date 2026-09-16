@@ -6,3 +6,8 @@ class CustomerNotFoundError(DomainError):
     def __init__(self, customer_id: int):
         self.customer_id = customer_id
         super().__init__(f"Cliente {customer_id} não encontrado")
+
+
+class InvalidCredentialsError(DomainError):
+    def __init__(self, message: str = "Credenciais inválidas"):
+        super().__init__(message)

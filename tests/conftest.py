@@ -29,3 +29,12 @@ def client(db_session):
     yield TestClient(app, raise_server_exceptions=False)
 
     app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def auth_headers(client):
+    """Header Authorization pronto pra uso em rotas protegidas por JWT."""
+    token = client.post(
+        "/auth/token", data={"username": "admin", "password": "admin"}
+    ).json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
