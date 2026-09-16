@@ -33,6 +33,15 @@ cliente normalizado tem a mesma cara (`CustomerCreate`).
 se já existe (por `source` + `external_id`) e decide entre criar ou atualizar. Rodar a sincronização
 da mesma fonte várias vezes não duplica clientes — é *idempotente*.
 
+## Endpoints
+
+| Método | Rota                  | Descrição                                    |
+|--------|------------------------|-----------------------------------------------|
+| POST   | `/customers/sync`      | Sincroniza as 3 fontes (idempotente)          |
+| GET    | `/customers`           | Lista todos os clientes normalizados          |
+| GET    | `/customers/{id}`      | Busca um cliente por id                        |
+| GET    | `/health`              | Health check                                   |
+
 ## Como rodar
 
 Pré-requisitos: [Poetry](https://python-poetry.org/), Python 3.14+ e Docker.
