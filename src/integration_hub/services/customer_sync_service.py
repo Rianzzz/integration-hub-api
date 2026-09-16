@@ -1,6 +1,10 @@
+import logging
+
 from integration_hub.domain.schemas import SyncResult
 from integration_hub.integrations.base import SourceAdapter
 from integration_hub.repositories.customer_repository import CustomerRepository
+
+logger = logging.getLogger(__name__)
 
 
 class CustomerSyncService:
@@ -10,6 +14,7 @@ class CustomerSyncService:
         self._repository = repository
 
     def sync(self, adapter: SourceAdapter) -> SyncResult:
+        logger.info("Iniciando sincronizacao da fonte %s", adapter.source_name)
         created = 0
         updated = 0
 
@@ -24,4 +29,10 @@ class CustomerSyncService:
                 self._repository.create(customer_data)
                 created += 1
 
+        logger.info(
+            "Sincronizacao da fonte %s concluida: %d criados, %d atualizados",
+            adapter.source_name,
+            created,
+            updated,
+        )
         return SyncResult(source=adapter.source_name, created=created, updated=updated)

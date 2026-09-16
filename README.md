@@ -42,6 +42,14 @@ da mesma fonte várias vezes não duplica clientes — é *idempotente*.
 | GET    | `/customers/{id}`      | Busca um cliente por id                        |
 | GET    | `/health`              | Health check                                   |
 
+## Erros e logging
+
+Erros de domínio (`domain/exceptions.py`) são traduzidos pra respostas HTTP em um lugar só
+(`main.py`), não espalhados pelos routers — ex: `CustomerNotFoundError` vira 404 automaticamente.
+Qualquer erro inesperado vira 500 com uma mensagem genérica (nunca vaza detalhe interno pro
+cliente) e vai pro log com o traceback completo. Logging estruturado configurado em
+`core/logging.py`.
+
 ## Como rodar
 
 Pré-requisitos: [Poetry](https://python-poetry.org/), Python 3.14+ e Docker.

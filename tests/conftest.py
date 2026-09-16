@@ -24,6 +24,8 @@ def client(db_session):
     """TestClient da API, usando a mesma sessão de teste (com a mesma limpeza automática)."""
     app.dependency_overrides[get_db] = lambda: db_session
 
-    yield TestClient(app)
+    # raise_server_exceptions=False: quando testamos um 500, queremos a resposta
+    # JSON de verdade, nao a excecao original relancada pelo TestClient.
+    yield TestClient(app, raise_server_exceptions=False)
 
     app.dependency_overrides.clear()

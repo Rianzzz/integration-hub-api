@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 
 from integration_hub.api.deps import CustomerRepositoryDep, CustomerSyncServiceDep
+from integration_hub.domain.exceptions import CustomerNotFoundError
 from integration_hub.domain.schemas import CustomerRead, SyncResult
 from integration_hub.integrations.base import SourceAdapter
 from integration_hub.integrations.source_a import SourceAAdapter
@@ -31,5 +32,5 @@ def list_customers(repository: CustomerRepositoryDep) -> list[CustomerRead]:
 def get_customer(customer_id: int, repository: CustomerRepositoryDep) -> CustomerRead:
     customer = repository.get_by_id(customer_id)
     if customer is None:
-        raise HTTPException(status_code=404, detail="Cliente não encontrado")
+        raise CustomerNotFoundError(customer_id)
     return customer
