@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, computed_field
 
 
 class CustomerCreate(BaseModel):
@@ -29,3 +29,16 @@ class CustomerRead(BaseModel):
     document: str | None
     created_at: datetime
     updated_at: datetime
+
+
+class SyncResult(BaseModel):
+    """Resumo de uma sincronização: quantos clientes foram criados vs. atualizados."""
+
+    source: str
+    created: int
+    updated: int
+
+    @computed_field
+    @property
+    def total(self) -> int:
+        return self.created + self.updated

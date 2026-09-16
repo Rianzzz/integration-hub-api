@@ -29,6 +29,10 @@ formato diferente (Fonte A: campos em português; Fonte B: contato aninhado; Fon
 mínimo), e o adapter é o único lugar que conhece esse formato — pro resto do sistema, todo
 cliente normalizado tem a mesma cara (`CustomerCreate`).
 
+`CustomerSyncService` orquestra a sincronização: pra cada cliente que o adapter devolve, verifica
+se já existe (por `source` + `external_id`) e decide entre criar ou atualizar. Rodar a sincronização
+da mesma fonte várias vezes não duplica clientes — é *idempotente*.
+
 ## Como rodar
 
 Pré-requisitos: [Poetry](https://python-poetry.org/), Python 3.14+ e Docker.
