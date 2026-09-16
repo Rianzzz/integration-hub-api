@@ -1,5 +1,7 @@
 # Integration Hub API
 
+[![CI](https://github.com/Rianzzz/integration-hub-api/actions/workflows/ci.yml/badge.svg)](https://github.com/Rianzzz/integration-hub-api/actions/workflows/ci.yml)
+
 API que recebe dados de clientes vindos de fontes diferentes (cada uma com seu próprio formato),
 normaliza tudo para um formato único e centraliza em um banco PostgreSQL.
 
