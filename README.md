@@ -50,6 +50,12 @@ Qualquer erro inesperado vira 500 com uma mensagem genérica (nunca vaza detalhe
 cliente) e vai pro log com o traceback completo. Logging estruturado configurado em
 `core/logging.py`.
 
+## Resiliência
+
+`SourceAdapter` tenta buscar dados da fonte externa até 3 vezes (com espera entre tentativas)
+antes de desistir, mas só para falhas de conexão — um erro de programação não é retentado às
+cegas. Como isso vive na classe base, todo adapter novo ganha resiliência de graça.
+
 ## Como rodar
 
 Pré-requisitos: [Poetry](https://python-poetry.org/), Python 3.14+ e Docker.
