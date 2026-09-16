@@ -5,6 +5,14 @@
 API que recebe dados de clientes vindos de fontes diferentes (cada uma com seu próprio formato),
 normaliza tudo para um formato único e centraliza em um banco PostgreSQL.
 
+Projeto de portfólio construído em etapas, uma funcionalidade por commit — o
+[histórico de commits](https://github.com/Rianzzz/integration-hub-api/commits/master) conta essa
+história em ordem.
+
+## Tecnologias
+
+Python 3.14 · FastAPI · SQLAlchemy 2.0 · Alembic · PostgreSQL · Pydantic v2 · JWT · Docker · pytest · ruff · GitHub Actions
+
 ## Arquitetura
 
 O projeto segue uma separação em camadas, onde cada camada só conhece a camada imediatamente abaixo:
@@ -14,8 +22,8 @@ api/            → rotas HTTP (FastAPI). Traduz request/response, não tem regr
 services/       → regras de negócio e orquestração dos casos de uso.
 repositories/   → acesso a dados (banco). A única camada que fala com o banco.
 integrations/   → adapters que conversam com cada fonte externa e normalizam seus dados.
-domain/         → modelos (SQLAlchemy) e schemas (Pydantic) compartilhados entre camadas.
-core/           → configuração, conexão com banco, logging.
+domain/         → modelos (SQLAlchemy), schemas (Pydantic) e exceções de negócio.
+core/           → configuração, conexão com banco, logging, segurança (JWT).
 ```
 
 Fluxo típico: `api` recebe a request → chama um `service` → o `service` usa um `integration`
@@ -37,21 +45,25 @@ da mesma fonte várias vezes não duplica clientes — é *idempotente*.
 
 ## Endpoints
 
-| Método | Rota                  | Descrição                                    |
-|--------|------------------------|-----------------------------------------------|
-| POST   | `/auth/token`          | Login (form: username, password) → JWT        |
-| POST   | `/customers/sync`      | Sincroniza as 3 fontes (idempotente, requer login) |
-| GET    | `/customers`           | Lista todos os clientes normalizados          |
-| GET    | `/customers/{id}`      | Busca um cliente por id                        |
-| GET    | `/health`              | Health check                                   |
+| Método | Rota                | Descrição                                          |
+|--------|---------------------|-----------------------------------------------------|
+| POST   | `/auth/token`       | Login (form: username, password) → JWT               |
+| POST   | `/customers/sync`   | Sincroniza as 3 fontes (idempotente, requer login)    |
+| GET    | `/customers`        | Lista todos os clientes normalizados                  |
+| GET    | `/customers/{id}`   | Busca um cliente por id                               |
+| GET    | `/health`           | Health check                                          |
 
-## Erros e logging
+Documentação interativa (Swagger UI) em `/docs` — dá pra testar tudo direto do navegador.
 
-Erros de domínio (`domain/exceptions.py`) são traduzidos pra respostas HTTP em um lugar só
-(`main.py`), não espalhados pelos routers — ex: `CustomerNotFoundError` vira 404 automaticamente.
-Qualquer erro inesperado vira 500 com uma mensagem genérica (nunca vaza detalhe interno pro
-cliente) e vai pro log com o traceback completo. Logging estruturado configurado em
-`core/logging.py`.
+Exemplo de resposta de `POST /customers/sync`:
+
+```json
+[
+  { "source": "source_a", "created": 2, "updated": 0, "total": 2 },
+  { "source": "source_b", "created": 2, "updated": 0, "total": 2 },
+  { "source": "source_c", "created": 2, "updated": 0, "total": 2 }
+]
+```
 
 ## Autenticação
 
@@ -65,6 +77,14 @@ curl -X POST http://localhost:8000/customers/sync -H "Authorization: Bearer <tok
 ```
 
 Usuário/senha e a chave do JWT vêm do `.env` (`API_USERNAME`, `API_PASSWORD`, `JWT_SECRET_KEY`).
+
+## Erros e logging
+
+Erros de domínio (`domain/exceptions.py`) são traduzidos pra respostas HTTP em um lugar só
+(`main.py`), não espalhados pelos routers — ex: `CustomerNotFoundError` vira 404 automaticamente.
+Qualquer erro inesperado vira 500 com uma mensagem genérica (nunca vaza detalhe interno pro
+cliente) e vai pro log com o traceback completo. Logging estruturado configurado em
+`core/logging.py`.
 
 ## Resiliência
 
@@ -80,6 +100,7 @@ Pré-requisitos: [Poetry](https://python-poetry.org/), Python 3.14+ e Docker.
 cp .env.example .env       # ajuste se quiser, os defaults já funcionam
 docker compose up -d db    # sobe o Postgres
 poetry install
+poetry run alembic upgrade head
 poetry run uvicorn integration_hub.main:app --reload
 ```
 
@@ -94,7 +115,7 @@ poetry run alembic revision --autogenerate -m "descricao"   # gera uma nova a pa
 
 ## Testes
 
-Os testes de repository rodam contra o Postgres real (não usam mocks nem SQLite) —
+Os testes de repository/service/API rodam contra o Postgres real (não usam mocks nem SQLite) —
 é necessário ter o `docker compose up -d db` de pé antes de rodar.
 
 ```bash
@@ -107,6 +128,23 @@ poetry run pytest
 poetry run ruff check .
 ```
 
+## CI
+
+Todo push/PR na `master` roda lint + testes automaticamente no GitHub Actions, contra um
+Postgres real (service container) — ver `.github/workflows/ci.yml`.
+
+## Próximos passos
+
+Ideias pra evoluir o projeto além do escopo atual:
+
+- Paginação em `GET /customers` (hoje retorna tudo de uma vez)
+- Rate limiting nas rotas públicas
+- Usuários reais no banco em vez de credencial fixa no `.env`
+- Endpoint de sincronização por fonte individual (`POST /customers/sync/{source}`)
+- Métricas de observabilidade (Prometheus) além do log estruturado atual
+
 ## Status do projeto
 
-Em desenvolvimento — construído em etapas, uma funcionalidade por commit.
+MVP completo — as 3 fontes simuladas sincronizam de ponta a ponta, com autenticação, tratamento
+de erros, retry e CI. Testado tanto automaticamente (pytest) quanto manualmente, com o servidor
+rodando de verdade contra um Postgres real.
